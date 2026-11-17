@@ -6,7 +6,7 @@ on:
       version:
         description: '版本号（仅用于产物命名，如 1.2.0）'
         required: false
-        default: '1.2.0'
+        default: '1.2.1'
   push:
     branches: [main]
 
@@ -41,6 +41,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Leafbook-DMG-${{ inputs.version || 'dev' }}
+          name: Leafbook-DMG
           path: out/*
           if-no-files-found: error
