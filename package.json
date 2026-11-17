@@ -1,1 +1,64 @@
-{"author": "hanson-zz", "build": {"appId": "app.leafbook.maker", "directories": {"output": "dist"}, "dmg": {"title": "Leafbook 叶书制作器", "window": {"height": 380, "width": 540}}, "files": ["src/**/*", "vendor/**/*", "package.json"], "mac": {"category": "public.app-category.productivity", "icon": "build/icon.png", "target": [{"arch": ["x64", "arm64"], "target": "dmg"}]}, "productName": "Leafbook"}, "description": "Leafbook 叶书制作器 — 在 Mac 上做互动电子书，导出单文件 H5 在微信传播", "devDependencies": {"electron": "^31.7.7", "electron-builder": "^24.13.3"}, "license": "MIT", "main": "src/main.js", "name": "leafbook-maker", "scripts": {"dist:mac": "electron-builder --mac dmg --x64 --arm64", "start": "electron .", "test": "node test/logic-test.js"}, "version": "1.2.0"}
+{
+  "author": "hanson-zz",
+  "build": {
+    "appId": "app.leafbook.maker",
+    "directories": {
+      "output": "dist"
+    },
+    "dmg": {
+      "title": "Leafbook",
+      "background": "build/background.png",
+      "iconSize": 110,
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 140,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "src/**/*",
+      "vendor/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "arch": [
+            "x64",
+            "arm64"
+          ],
+          "target": "dmg"
+        }
+      ]
+    },
+    "productName": "Leafbook"
+  },
+  "description": "Leafbook 叶书制作器 — 在 Mac 上做互动电子书，导出单文件 H5 在微信传播",
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "license": "MIT",
+  "main": "src/main.js",
+  "name": "leafbook-maker",
+  "scripts": {
+    "dist:mac": "electron-builder --mac dmg --x64 --arm64",
+    "start": "electron .",
+    "test": "node test/logic-test.js"
+  },
+  "version": "1.2.1"
+}
