@@ -1,0 +1,46 @@
+name: Build Leafbook DMG
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（仅用于产物命名，如 1.2.0）'
+        required: false
+        default: '1.2.0'
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Logic test
+        run: npm test
+
+      - name: Build DMG (x64 + arm64)
+        run: npm run dist:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Collect DMG + 说明
+        run: |
+          mkdir -p out
+          cp dist/*.dmg out/ || true
+          cp "打不开怎么办.txt" out/ || true
+          ls -lh out
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Leafbook-DMG-${{ inputs.version || 'dev' }}
+          path: out/*
+          if-no-files-found: error
