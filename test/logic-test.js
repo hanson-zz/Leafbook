@@ -18,7 +18,7 @@ console.log('1) JS 语法检查');
 console.log('2) JSON 有效性');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 passed++; console.log('  ✓ package.json 可解析');
-ok('版本号为 1.2.0', () => assert.strictEqual(pkg.version, '1.2.0'));
+ok('版本号为 1.2.1', () => assert.strictEqual(pkg.version, '1.2.1'));
 
 console.log('3) 尺寸模块');
 const S = require(path.join(root, 'src/sizes.js'));
