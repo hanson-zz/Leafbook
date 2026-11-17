@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:">
+<title>Leafbook 叶书制作器</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">🍃 Leafbook <span>叶书制作器</span></div>
+  <input id="projName" type="text" placeholder="项目名称" value="我的电子书">
+  <span id="sizeSummary" class="size-summary"></span>
+  <div class="top-actions">
+    <button id="btnNew" type="button">新建</button>
+    <button id="btnOpen" type="button">打开项目</button>
+    <button id="btnSave" type="button">保存项目</button>
+    <span id="exportSize" class="size-summary" title="预计导出文件大小"></span>
+    <button id="btnExport" class="primary" type="button">导出微信 H5</button>
+  </div>
+</header>
+
+<div id="layout">
+  <!-- 左：页面列表 -->
+  <aside id="pagesCol">
+    <div class="col-head">页面 <span id="pageCount"></span></div>
+    <div id="thumbList"></div>
+    <div class="col-foot">
+      <button id="btnAddImages" type="button">＋ 导入图片</button>
+      <button id="btnAddPdf" type="button">＋ 导入 PDF</button>
+      <div id="pdfProgress" class="pdf-progress" style="display:none"></div>
+      <button id="btnAddBlank" type="button">＋ 空白页</button>
+      <div class="row-btns">
+        <button id="btnUp" type="button">上移</button>
+        <button id="btnDown" type="button">下移</button>
+        <button id="btnDel" class="danger" type="button">删除</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 中：预览 -->
+  <main id="stageCol">
+    <div class="stage-bar">
+      <div class="seg">
+        <button id="pvBook" class="on" type="button">📖 书籍翻页</button>
+        <button id="pvStory" type="button">📱 图文滑动</button>
+      </div>
+      <button id="pvPrev" type="button">‹ 上一页</button>
+      <span id="pvCounter">0 / 0</span>
+      <button id="pvNext" type="button">下一页 ›</button>
+    </div>
+    <div id="stage">
+      <div id="stageScene"><div id="stageSceneFx"></div></div>
+      <div id="bookFrame"><div id="bookHost"></div></div>
+      <div id="storyHost" style="display:none"></div>
+      <div id="stageEmpty">还没有页面<br>点左侧「导入图片」，每张图就是一页</div>
+    </div>
+    <div class="stage-hint" id="stageHint">书籍模式：拖动页角翻页（真实纸张卷曲效果）</div>
+  </main>
+
+  <!-- 右：属性 -->
+  <aside id="propsCol">
+    <section>
+      <h3>当前页文字</h3>
+      <label>标题<input id="pgTitle" type="text" placeholder="页面标题（可空）"></label>
+      <label>正文<textarea id="pgBody" rows="3" placeholder="页面说明文字（可空）"></textarea></label>
+      <label class="color-row">本页背景 <input id="pgBg" type="color" value="#ffffff"> <button id="pgBgClear" type="button">跟随整本</button></label>
+    </section>
+    <section>
+      <h3>整本设置</h3>
+      <label class="color-row">页面背景 <input id="projBg" type="color" value="#ffffff"></label>
+      <label class="check-row"><input id="coverMode" type="checkbox"> 第一页作为封面（单独一页展示）</label>
+      <div class="music-box">
+        <div>背景音乐：<span id="musicName">未添加</span></div>
+        <div class="row-btns">
+          <button id="btnMusic" type="button">导入音乐</button>
+          <button id="btnMusicDel" type="button">移除</button>
+        </div>
+        <p class="note">微信里需读者点「开启音乐」后才播放，翻页不会中断。</p>
+      </div>
+    </section>
+    <section>
+      <h3>阅读背景</h3>
+      <div id="bgPresets" class="bg-swatches"></div>
+      <label class="color-row">自定义颜色 <input id="bgColor" type="color" value="#f5e6da"></label>
+      <div class="music-box">
+        <div>背景图：<span id="bgImageName">未导入</span></div>
+        <div class="row-btns">
+          <button id="btnBgImage" type="button">导入背景图</button>
+          <button id="btnBgImageDel" type="button">移除背景图</button>
+        </div>
+      </div>
+      <p class="note">阅读背景就是读者打开电子书时、书本后面的那片场景。预览和导出的电子书都会用它；导入自己的图会自动虚化压暗，不抢书的内容。</p>
+    </section>
+    <section>
+      <h3>导出设置</h3>
+      <label>导出清晰度
+        <select id="exportQuality">
+          <option value="hd">高清（更锐利，文件较大）</option>
+          <option value="std" selected>标准</option>
+          <option value="small">小文件（发微信更快）</option>
+        </select>
+      </label>
+      <p class="note">预计导出大小：<span id="exportSize2">—</span>（含图片、音乐与翻页效果；清晰度越高文件越大）</p>
+      <p class="note">导出的书带翻页纸声（可关）、全屏按钮，电脑上还能用 ← → 键翻页。</p>
+    </section>
+    <section>
+      <h3>页面尺寸</h3>
+      <div id="setSizeBox"></div>
+      <button id="btnApplySize" class="primary block" type="button">应用尺寸</button>
+      <p class="note">改尺寸后，已有图片按「完整显示」适配新页面，不裁剪、不拉伸；文字与背景跟随新尺寸排版。</p>
+    </section>
+  </aside>
+</div>
+
+<!-- 新建项目面板 -->
+<div id="newDlg" class="dlg-mask">
+  <div class="dlg">
+    <h2>新建电子书</h2>
+    <label>项目名称<input id="newName" type="text" value="我的电子书"></label>
+    <div id="newSizeBox"></div>
+    <div class="dlg-actions">
+      <button id="btnNewOpen" type="button">打开已有项目…</button>
+      <span class="spacer"></span>
+      <button id="btnNewCancel" type="button">取消</button>
+      <button id="btnCreate" class="primary" type="button">创建项目</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="../vendor/page-flip.browser.min.js"></script>
+<script src="../vendor/pdf.min.js"></script>
+<script src="sizes.js"></script>
+<script src="backgrounds.js"></script>
+<script src="quality.js"></script>
+<script src="exporter.js"></script>
+<script src="renderer.js"></script>
+</body>
+</html>
